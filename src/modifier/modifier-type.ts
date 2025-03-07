@@ -11,7 +11,89 @@ import { Type } from "#enums/type";
 import type { EnemyPokemon, PlayerPokemon, PokemonMove } from "#app/field/pokemon";
 import type Pokemon from "#app/field/pokemon";
 import { getPokemonNameWithAffix } from "#app/messages";
-import { AddPokeballModifier, AddVoucherModifier, AttackTypeBoosterModifier, BaseStatModifier, BerryModifier, BoostBugSpawnModifier, BypassSpeedChanceModifier, ContactHeldItemTransferChanceModifier, CritBoosterModifier, DamageMoneyRewardModifier, DoubleBattleChanceBoosterModifier, EnemyAttackStatusEffectChanceModifier, EnemyDamageBoosterModifier, EnemyDamageReducerModifier, EnemyEndureChanceModifier, EnemyFusionChanceModifier, EnemyStatusEffectHealChanceModifier, EnemyTurnHealModifier, EvolutionItemModifier, EvolutionStatBoosterModifier, EvoTrackerModifier, ExpBalanceModifier, ExpBoosterModifier, ExpShareModifier, ExtraModifierModifier, FlinchChanceModifier, FusePokemonModifier, GigantamaxAccessModifier, HealingBoosterModifier, HealShopCostModifier, HiddenAbilityRateBoosterModifier, HitHealModifier, IvScannerModifier, LevelIncrementBoosterModifier, LockModifierTiersModifier, MapModifier, MegaEvolutionAccessModifier, MoneyInterestModifier, MoneyMultiplierModifier, MoneyRewardModifier, MultipleParticipantExpBonusModifier, PokemonAllMovePpRestoreModifier, PokemonBaseStatFlatModifier, PokemonBaseStatTotalModifier, PokemonExpBoosterModifier, PokemonFormChangeItemModifier, PokemonFriendshipBoosterModifier, PokemonHeldItemModifier, PokemonHpRestoreModifier, PokemonIncrementingStatModifier, PokemonInstantReviveModifier, PokemonLevelIncrementModifier, PokemonMoveAccuracyBoosterModifier, PokemonMultiHitModifier, PokemonNatureChangeModifier, PokemonNatureWeightModifier, PokemonPpRestoreModifier, PokemonPpUpModifier, PokemonStatusHealModifier, PreserveBerryModifier, RememberMoveModifier, ResetNegativeStatStageModifier, ShinyRateBoosterModifier, SpeciesCritBoosterModifier, SpeciesStatBoosterModifier, SurviveDamageModifier, SwitchEffectTransferModifier, TempCritBoosterModifier, TempStatStageBoosterModifier, TerastallizeAccessModifier, TerrastalizeModifier, TmModifier, TurnHealModifier, TurnHeldItemTransferModifier, TurnStatusEffectModifier, type EnemyPersistentModifier, type Modifier, type PersistentModifier, TempExtraModifierModifier, CriticalCatchChanceBoosterModifier } from "#app/modifier/modifier";
+import {
+  AddPokeballModifier,
+  AddVoucherModifier,
+  AttackTypeBoosterModifier,
+  BaseStatModifier,
+  BerryModifier,
+  BoostBugSpawnModifier,
+  BypassSpeedChanceModifier,
+  ContactHeldItemTransferChanceModifier,
+  CritBoosterModifier,
+  DamageMoneyRewardModifier,
+  DoubleBattleChanceBoosterModifier,
+  EnemyAttackStatusEffectChanceModifier,
+  EnemyDamageBoosterModifier,
+  EnemyDamageReducerModifier,
+  EnemyEndureChanceModifier,
+  EnemyFusionChanceModifier,
+  EnemyStatusEffectHealChanceModifier,
+  EnemyTurnHealModifier,
+  EvolutionItemModifier,
+  EvolutionStatBoosterModifier,
+  EvoTrackerModifier,
+  ExpBalanceModifier,
+  ExpBoosterModifier,
+  ExpShareModifier,
+  ExtraModifierModifier,
+  FlinchChanceModifier,
+  FusePokemonModifier,
+  GigantamaxAccessModifier,
+  HealingBoosterModifier,
+  HealShopCostModifier,
+  HiddenAbilityRateBoosterModifier,
+  HitHealModifier,
+  IvScannerModifier,
+  LevelIncrementBoosterModifier,
+  LockModifierTiersModifier,
+  MapModifier,
+  MegaEvolutionAccessModifier,
+  MoneyInterestModifier,
+  MoneyMultiplierModifier,
+  MoneyRewardModifier,
+  MultipleParticipantExpBonusModifier,
+  PokemonAllMovePpRestoreModifier,
+  PokemonBaseStatFlatModifier,
+  PokemonBaseStatTotalModifier,
+  PokemonExpBoosterModifier,
+  PokemonFormChangeItemModifier,
+  PokemonFriendshipBoosterModifier,
+  PokemonHeldItemModifier,
+  PokemonHpRestoreModifier,
+  PokemonIncrementingStatModifier,
+  PokemonInstantReviveModifier,
+  PokemonLevelIncrementModifier,
+  PokemonMoveAccuracyBoosterModifier,
+  PokemonMultiHitModifier,
+  PokemonNatureChangeModifier,
+  PokemonNatureWeightModifier,
+  PokemonPpRestoreModifier,
+  PokemonPpUpModifier,
+  PokemonStatusHealModifier,
+  PreserveBerryModifier,
+  RememberMoveModifier,
+  ResetNegativeStatStageModifier,
+  ShinyRateBoosterModifier,
+  SpeciesCritBoosterModifier,
+  SpeciesStatBoosterModifier,
+  SurviveDamageModifier,
+  SwitchEffectTransferModifier,
+  TempCritBoosterModifier,
+  TempStatStageBoosterModifier,
+  TerastallizeAccessModifier,
+  TerrastalizeModifier,
+  TmModifier,
+  TurnHealModifier,
+  TurnHeldItemTransferModifier,
+  TurnStatusEffectModifier,
+  type EnemyPersistentModifier,
+  type Modifier,
+  type PersistentModifier,
+  TempExtraModifierModifier,
+  CriticalCatchChanceBoosterModifier,
+  HitDamageModifier
+} from "#app/modifier/modifier";
 import { ModifierTier } from "#app/modifier/modifier-tier";
 import Overrides from "#app/overrides";
 import { Unlockables } from "#app/system/unlockables";
@@ -1624,6 +1706,8 @@ export const modifierTypes = {
   }),
   MYSTERY_ENCOUNTER_MACHO_BRACE: () => new PokemonHeldItemModifierType("modifierType:ModifierType.MYSTERY_ENCOUNTER_MACHO_BRACE", "macho_brace", (type, args) => new PokemonIncrementingStatModifier(type, (args[0] as Pokemon).id)),
   MYSTERY_ENCOUNTER_GOLDEN_BUG_NET: () => new ModifierType("modifierType:ModifierType.MYSTERY_ENCOUNTER_GOLDEN_BUG_NET", "golden_net", (type, _args) => new BoostBugSpawnModifier(type)),
+
+  LIFE_ORB: () => new PokemonHeldItemModifierType("modifierType:ModifierType.LIFE_ORB", "life_orb", (type, args) => new HitDamageModifier(type, (args[0] as Pokemon).id, 0.3))
 };
 
 interface ModifierPool {
@@ -1885,6 +1969,7 @@ const modifierPool: ModifierPool = {
     new WeightedModifierType(modifierTypes.MEGA_BRACELET, () => Math.min(Math.ceil(globalScene.currentBattle.waveIndex / 50), 4) * 9, 36),
     new WeightedModifierType(modifierTypes.DYNAMAX_BAND, () => Math.min(Math.ceil(globalScene.currentBattle.waveIndex / 50), 4) * 9, 36),
     new WeightedModifierType(modifierTypes.VOUCHER_PLUS, (_party: Pokemon[], rerollCount: number) => !globalScene.gameMode.isDaily ? Math.max(3 - rerollCount * 1, 0) : 0, 3),
+    new WeightedModifierType(modifierTypes.LIFE_ORB, 5)
   ].map(m => {
     m.setTier(ModifierTier.ROGUE); return m;
   }),

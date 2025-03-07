@@ -52,7 +52,30 @@ import { getTypeDamageMultiplier, getTypeRgb } from "#app/data/type";
 import { Type } from "#enums/type";
 import { getLevelTotalExp } from "#app/data/exp";
 import { Stat, type PermanentStat, type BattleStat, type EffectiveStat, PERMANENT_STATS, BATTLE_STATS, EFFECTIVE_STATS } from "#enums/stat";
-import { DamageMoneyRewardModifier, EnemyDamageBoosterModifier, EnemyDamageReducerModifier, EnemyEndureChanceModifier, EnemyFusionChanceModifier, HiddenAbilityRateBoosterModifier, BaseStatModifier, PokemonFriendshipBoosterModifier, PokemonHeldItemModifier, PokemonNatureWeightModifier, ShinyRateBoosterModifier, SurviveDamageModifier, TempStatStageBoosterModifier, TempCritBoosterModifier, StatBoosterModifier, CritBoosterModifier, PokemonBaseStatFlatModifier, PokemonBaseStatTotalModifier, PokemonIncrementingStatModifier, EvoTrackerModifier, PokemonMultiHitModifier } from "#app/modifier/modifier";
+import {
+  DamageMoneyRewardModifier,
+  EnemyDamageBoosterModifier,
+  EnemyDamageReducerModifier,
+  EnemyEndureChanceModifier,
+  EnemyFusionChanceModifier,
+  HiddenAbilityRateBoosterModifier,
+  BaseStatModifier,
+  PokemonFriendshipBoosterModifier,
+  PokemonHeldItemModifier,
+  PokemonNatureWeightModifier,
+  ShinyRateBoosterModifier,
+  SurviveDamageModifier,
+  TempStatStageBoosterModifier,
+  TempCritBoosterModifier,
+  StatBoosterModifier,
+  CritBoosterModifier,
+  PokemonBaseStatFlatModifier,
+  PokemonBaseStatTotalModifier,
+  PokemonIncrementingStatModifier,
+  EvoTrackerModifier,
+  PokemonMultiHitModifier,
+  HitDamageModifier
+} from "#app/modifier/modifier";
 import { PokeballType } from "#enums/pokeball";
 import { Gender } from "#app/data/gender";
 import { initMoveAnim, loadMoveAnimAssets } from "#app/data/battle-anims";
@@ -2831,6 +2854,9 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
       glaiveRushMultiplier.value = 2;
     }
 
+    const lifeOrbMultiplier = new Utils.NumberHolder(1);
+    globalScene.applyModifiers(HitDamageModifier, source.isPlayer(), source, null, lifeOrbMultiplier, null);
+
     /** The damage multiplier when the given move critically hits */
     const criticalMultiplier = new Utils.NumberHolder(isCritical ? 1.5 : 1);
     applyAbAttrs(MultCritAbAttr, source, null, simulated, criticalMultiplier);
@@ -2839,7 +2865,8 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
      * A multiplier for random damage spread in the range [0.85, 1]
      * This is always 1 for simulated calls.
      */
-    const randomMultiplier = simulated ? 1 : ((this.randSeedIntRange(85, 100)) / 100);
+    //const randomMultiplier = simulated ? 1 : ((this.randSeedIntRange(85, 100)) / 100);
+    const randomMultiplier = 1;
 
     const sourceTypes = source.getTypes();
     const sourceTeraType = source.getTeraType();
@@ -2912,6 +2939,7 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
       * multiStrikeEnhancementMultiplier.value
       * arenaAttackTypeMultiplier.value
       * glaiveRushMultiplier.value
+      * lifeOrbMultiplier.value
       * criticalMultiplier.value
       * randomMultiplier
       * stabMultiplier.value
@@ -4832,7 +4860,7 @@ export class EnemyPokemon extends Pokemon {
     if (!dataSource) {
       this.generateAndPopulateMoveset();
 
-      if (shinyLock || Overrides.OPP_SHINY_OVERRIDE === false) {
+      if (shinyLock || !Overrides.OPP_SHINY_OVERRIDE) {
         this.shiny = false;
       } else {
         this.trySetShiny();

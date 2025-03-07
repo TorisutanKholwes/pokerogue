@@ -32,7 +32,32 @@ import { WeatherType } from "#enums/weather-type";
  * }
  * ```
  */
-const overrides = {} satisfies Partial<InstanceType<typeof DefaultOverrides>>;
+const overrides = {
+  STARTING_LEVEL_OVERRIDE: 100,
+  STARTER_SPECIES_OVERRIDE: Species.ETERNATUS,
+  STARTING_HELD_ITEMS_OVERRIDE: [
+    { name: "LIFE_ORB" }
+  ],
+  ABILITY_OVERRIDE: Abilities.SHEER_FORCE,
+  SHINY_OVERRIDE: true,
+  VARIANT_OVERRIDE: 2,
+  MOVESET_OVERRIDE: [
+    Moves.FAKE_OUT,
+    Moves.SWORDS_DANCE,
+    Moves.TACKLE,
+    Moves.TRIPLE_AXEL
+  ],
+  //OPP_ABILITY_OVERRIDE: Abilities.STURDY,
+  OPP_IVS_OVERRIDE: [ 31, 31, 31, 31, 31, 31 ],
+  OPP_LEVEL_OVERRIDE: 5,
+  OPP_SPECIES_OVERRIDE: Species.BLISSEY,
+  OPP_MOVESET_OVERRIDE: [
+    Moves.SUBSTITUTE
+  ],
+  OPP_SHINY_OVERRIDE: true,
+  OPP_VARIANT_OVERRIDE: 2,
+  BATTLE_TYPE_OVERRIDE: "single"
+} satisfies Partial<InstanceType<typeof DefaultOverrides>>;
 
 /**
  * If you need to add Overrides values for local testing do that inside {@linkcode overrides}
@@ -60,7 +85,7 @@ class DefaultOverrides {
    *
    * If `"odd-doubles"`, follow the `"double"` rule on odd wave numbers, and follow the `"single"` rule on even wave numbers.
    */
-  readonly BATTLE_TYPE_OVERRIDE: BattleStyle | null = null;
+  readonly BATTLE_TYPE_OVERRIDE: string | null = null;
   readonly STARTING_WAVE_OVERRIDE: number = 0;
   readonly STARTING_BIOME_OVERRIDE: Biome = Biome.TOWN;
   readonly ARENA_TINT_OVERRIDE: TimeOfDay | null = null;

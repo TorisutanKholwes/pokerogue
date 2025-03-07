@@ -1,12 +1,12 @@
 import { FusionSpeciesFormEvolution, pokemonEvolutions } from "#app/data/balance/pokemon-evolutions";
 import { getBerryEffectFunc, getBerryPredicate } from "#app/data/berry";
 import { getLevelTotalExp } from "#app/data/exp";
-import { allMoves } from "#app/data/move";
+import { allMoves, MoveCategory } from "#app/data/move";
 import { MAX_PER_TYPE_POKEBALLS } from "#app/data/pokeball";
 import { type FormChangeItem, SpeciesFormChangeItemTrigger } from "#app/data/pokemon-forms";
 import { getStatusEffectHealText } from "#app/data/status-effect";
-import type { PlayerPokemon } from "#app/field/pokemon";
-import Pokemon from "#app/field/pokemon";
+import type { PlayerPokemon, TurnMove } from "#app/field/pokemon";
+import Pokemon, { MoveResult } from "#app/field/pokemon";
 import { getPokemonNameWithAffix } from "#app/messages";
 import Overrides from "#app/overrides";
 import { EvolutionPhase } from "#app/phases/evolution-phase";
@@ -23,15 +23,34 @@ import type { Moves } from "#enums/moves";
 import type { Nature } from "#enums/nature";
 import type { PokeballType } from "#enums/pokeball";
 import { Species } from "#enums/species";
-import { type PermanentStat, type TempBattleStat, BATTLE_STATS, Stat, TEMP_BATTLE_STATS } from "#enums/stat";
+import { BATTLE_STATS, type PermanentStat, Stat, TEMP_BATTLE_STATS, type TempBattleStat } from "#enums/stat";
 import { StatusEffect } from "#enums/status-effect";
 import type { Type } from "#enums/type";
 import i18next from "i18next";
-import { type DoubleBattleChanceBoosterModifierType, type EvolutionItemModifierType, type FormChangeItemModifierType, type ModifierOverride, type ModifierType, type PokemonBaseStatTotalModifierType, type PokemonExpBoosterModifierType, type PokemonFriendshipBoosterModifierType, type PokemonMoveAccuracyBoosterModifierType, type PokemonMultiHitModifierType, type TerastallizeModifierType, type TmModifierType, getModifierType, ModifierPoolType, ModifierTypeGenerator, modifierTypes, PokemonHeldItemModifierType } from "./modifier-type";
+import {
+  type DoubleBattleChanceBoosterModifierType,
+  type EvolutionItemModifierType,
+  type FormChangeItemModifierType,
+  getModifierType,
+  type ModifierOverride,
+  ModifierPoolType,
+  type ModifierType,
+  ModifierTypeGenerator,
+  modifierTypes,
+  type PokemonBaseStatTotalModifierType,
+  type PokemonExpBoosterModifierType,
+  type PokemonFriendshipBoosterModifierType,
+  PokemonHeldItemModifierType,
+  type PokemonMoveAccuracyBoosterModifierType,
+  type PokemonMultiHitModifierType,
+  type TerastallizeModifierType,
+  type TmModifierType
+} from "./modifier-type";
 import { Color, ShadowColor } from "#enums/color";
 import { FRIENDSHIP_GAIN_FROM_RARE_CANDY } from "#app/data/balance/starters";
 import { applyAbAttrs, CommanderAbAttr } from "#app/data/ability";
 import { globalScene } from "#app/global-scene";
+import { Abilities } from "#enums/abilities";
 
 export type ModifierPredicate = (modifier: Modifier) => boolean;
 
@@ -3652,6 +3671,53 @@ export class EnemyFusionChanceModifier extends EnemyPersistentModifier {
   }
 }
 
+export class HitDamageModifier extends PokemonHeldItemModifier {
+
+  private damageMultiplier: number;
+
+  constructor(type: ModifierType, pokemonId: number, damageMultiplier: number, stackCount?: number) {
+    super(type, pokemonId, stackCount);
+    this.damageMultiplier = damageMultiplier;
+  }
+
+  matchType(modifier: Modifier): boolean {
+    return modifier instanceof HitDamageModifier;
+  }
+
+  clone() {
+    return new HitDamageModifier(this.type, this.pokemonId, this.stackCount);
+  }
+
+  /**
+   * Applies {@linkcode HitDamageModifier}
+   * @param pokemon the {@linkcode Pokemon} that holds the item
+   * @param damage the {@linkcode NumberHolder} that holds the damage value
+   * @param user if we need to damage the user
+   * @returns always `true`
+   */
+  override apply(pokemon: Pokemon, damage?: NumberHolder | null, user?: boolean | null): boolean {
+    if (!isNullOrUndefined(damage)) {
+      damage.value = 1 + this.damageMultiplier;
+    }
+    const move: TurnMove = pokemon.getLastXMoves()[0];
+    if (!isNullOrUndefined(user) && (user && pokemon.hp > 0)) {
+      const resultFailed: MoveResult[] = [ MoveResult.FAIL, MoveResult.MISS ];
+      if ((pokemon.getAbility().id !== Abilities.SHEER_FORCE || (allMoves[move.move].chance < 1)) &&
+          ((!isNullOrUndefined(move.move) && allMoves[move.move].category !== MoveCategory.STATUS))
+          && !resultFailed.includes(<MoveResult>move.result)) {
+        pokemon.damageAndUpdate(toDmgValue(pokemon.getMaxHp() * (0.1 * this.stackCount)));
+        globalScene.queueMessage(i18next.t("modifier:afterTurnDamage", { pokemonNameWithAffix: getPokemonNameWithAffix(pokemon) } ));
+      }
+    }
+    return true;
+  }
+
+  getMaxHeldItemCount(_pokemon?: Pokemon): number {
+    return 1;
+  }
+}
+
+
 /**
  * Uses either `MODIFIER_OVERRIDE` in overrides.ts to set {@linkcode PersistentModifier}s for either:
  *  - The player
@@ -3690,6 +3756,7 @@ export function overrideModifiers(isPlayer: boolean = true): void {
     }
   });
 }
+
 
 /**
  * Uses either `HELD_ITEMS_OVERRIDE` in overrides.ts to set {@linkcode PokemonHeldItemModifier}s for either:

@@ -56,8 +56,7 @@ import { getPokemonNameWithAffix } from "#app/messages";
 import {
   ContactHeldItemTransferChanceModifier,
   EnemyAttackStatusEffectChanceModifier,
-  FlinchChanceModifier,
-  HitHealModifier,
+  FlinchChanceModifier, HitHealModifier,
   PokemonMultiHitModifier,
 } from "#app/modifier/modifier";
 import { PokemonPhase } from "#app/phases/pokemon-phase";
