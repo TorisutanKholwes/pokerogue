@@ -7,7 +7,7 @@ import { getNatureName, getNatureStatMultiplier } from "#app/data/nature";
 import { getPokeballCatchMultiplier, getPokeballName, MAX_PER_TYPE_POKEBALLS } from "#app/data/pokeball";
 import { FormChangeItem, pokemonFormChanges, SpeciesFormChangeCondition, SpeciesFormChangeItemTrigger } from "#app/data/pokemon-forms";
 import { getStatusEffectDescriptor } from "#app/data/status-effect";
-import { Type } from "#enums/type";
+import { getTypeKey, Type } from "#enums/type";
 import type { EnemyPokemon, PlayerPokemon, PokemonMove } from "#app/field/pokemon";
 import type Pokemon from "#app/field/pokemon";
 import { getPokemonNameWithAffix } from "#app/messages";
@@ -92,7 +92,8 @@ import {
   type PersistentModifier,
   TempExtraModifierModifier,
   CriticalCatchChanceBoosterModifier,
-  HitDamageModifier
+  HitDamageModifier,
+  ShinySandwichItemModifier
 } from "#app/modifier/modifier";
 import { ModifierTier } from "#app/modifier/modifier-tier";
 import Overrides from "#app/overrides";
@@ -616,6 +617,35 @@ export class TempStatStageBoosterModifierType extends ModifierType implements Ge
 
   getPregenArgs(): any[] {
     return [ this.stat ];
+  }
+}
+
+export class ShinySandwichItemModifierType extends ModifierType implements GeneratedPersistentModifierType {
+  private type: Type;
+  private nameKey: string;
+
+  constructor(type: Type) {
+    const nameKey = ShinySandwichItemModifierTypeGenerator.types[type];
+    super("", nameKey, (_type, _args) => new ShinySandwichItemModifier(this, this.type, 10));
+
+    this.type = type;
+    this.nameKey = nameKey;
+  }
+
+  get name(): string {
+    return i18next.t("modifierType:ModifierType.ShinySandwichItem.name", {
+      type: i18next.t(getTypeKey(this.type))
+    });
+  }
+
+  getDescription(): string {
+    return i18next.t("modifierType:ModifierType.ShinySandwichItem.description", {
+      type: i18next.t(getTypeKey(this.type))
+    });
+  }
+
+  getPregenArgs(): any[] {
+    return [ this.type ];
   }
 }
 
@@ -1250,6 +1280,39 @@ class EvolutionItemModifierTypeGenerator extends ModifierTypeGenerator {
   }
 }
 
+export class ShinySandwichItemModifierTypeGenerator extends ModifierTypeGenerator {
+  public static readonly types: Record<number, string> = {
+    [Type.NORMAL]: "normal_sandwich",
+    [Type.FIGHTING]: "fighting_sandwich",
+    [Type.FLYING]: "flying_sandwich",
+    [Type.POISON]: "poison_sandwich",
+    [Type.GROUND]: "ground_sandwich",
+    [Type.ROCK]: "rock_sandwich",
+    [Type.BUG]: "bug_sandwich",
+    [Type.GHOST]: "ghost_sandwich",
+    [Type.STEEL]: "steel_sandwich",
+    [Type.FIRE]: "fire_sandwich",
+    [Type.WATER]: "water_sandwich",
+    [Type.GRASS]: "grass_sandwich",
+    [Type.ELECTRIC]: "electric_sandwich",
+    [Type.PSYCHIC]: "psychic_sandwich",
+    [Type.ICE]: "ice_sandwich",
+    [Type.DRAGON]: "dragon_sandwich",
+    [Type.DARK]: "dark_sandwich",
+    [Type.FAIRY]: "fairy_sandwich"
+  };
+
+  constructor() {
+    super((_party: Pokemon[], pregenArgs?: any[])=> {
+      if (pregenArgs) {
+        return new ShinySandwichItemModifierType(pregenArgs[0]);
+      }
+      const randType: Type = randSeedInt(Type.FAIRY + 1, 0);
+      return new ShinySandwichItemModifierType(randType);
+    });
+  }
+}
+
 class FormChangeItemModifierTypeGenerator extends ModifierTypeGenerator {
   constructor(isRareFormChangeItem: boolean) {
     super((party: Pokemon[], pregenArgs?: any[]) => {
@@ -1305,6 +1368,7 @@ class FormChangeItemModifierTypeGenerator extends ModifierTypeGenerator {
     });
   }
 }
+
 
 export class ContactHeldItemTransferChanceModifierType extends PokemonHeldItemModifierType {
   private chancePercent: number;
@@ -1466,6 +1530,10 @@ export type GeneratorModifierOverride = {
       name: keyof Pick<typeof modifierTypes, "TM_COMMON" | "TM_GREAT" | "TM_ULTRA">;
       type?: Moves;
     }
+  | {
+    name: keyof Pick<typeof modifierTypes, "SHINY_SANDWICH">;
+    type?: Type;
+  }
 );
 
 /** Type used to construct modifiers and held items for overriding purposes. */
@@ -1707,7 +1775,8 @@ export const modifierTypes = {
   MYSTERY_ENCOUNTER_MACHO_BRACE: () => new PokemonHeldItemModifierType("modifierType:ModifierType.MYSTERY_ENCOUNTER_MACHO_BRACE", "macho_brace", (type, args) => new PokemonIncrementingStatModifier(type, (args[0] as Pokemon).id)),
   MYSTERY_ENCOUNTER_GOLDEN_BUG_NET: () => new ModifierType("modifierType:ModifierType.MYSTERY_ENCOUNTER_GOLDEN_BUG_NET", "golden_net", (type, _args) => new BoostBugSpawnModifier(type)),
 
-  LIFE_ORB: () => new PokemonHeldItemModifierType("modifierType:ModifierType.LIFE_ORB", "life_orb", (type, args) => new HitDamageModifier(type, (args[0] as Pokemon).id, 0.3))
+  LIFE_ORB: () => new PokemonHeldItemModifierType("modifierType:ModifierType.LIFE_ORB", "life_orb", (type, args) => new HitDamageModifier(type, (args[0] as Pokemon).id, 0.3)),
+  SHINY_SANDWICH: () => new ShinySandwichItemModifierTypeGenerator()
 };
 
 interface ModifierPool {
@@ -1969,7 +2038,8 @@ const modifierPool: ModifierPool = {
     new WeightedModifierType(modifierTypes.MEGA_BRACELET, () => Math.min(Math.ceil(globalScene.currentBattle.waveIndex / 50), 4) * 9, 36),
     new WeightedModifierType(modifierTypes.DYNAMAX_BAND, () => Math.min(Math.ceil(globalScene.currentBattle.waveIndex / 50), 4) * 9, 36),
     new WeightedModifierType(modifierTypes.VOUCHER_PLUS, (_party: Pokemon[], rerollCount: number) => !globalScene.gameMode.isDaily ? Math.max(3 - rerollCount * 1, 0) : 0, 3),
-    new WeightedModifierType(modifierTypes.LIFE_ORB, 5)
+    new WeightedModifierType(modifierTypes.LIFE_ORB, 5),
+    new WeightedModifierType(modifierTypes.SHINY_SANDWICH, 2)
   ].map(m => {
     m.setTier(ModifierTier.ROGUE); return m;
   }),

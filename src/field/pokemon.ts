@@ -74,7 +74,7 @@ import {
   PokemonIncrementingStatModifier,
   EvoTrackerModifier,
   PokemonMultiHitModifier,
-  HitDamageModifier
+  HitDamageModifier, ShinySandwichItemModifier
 } from "#app/modifier/modifier";
 import { PokeballType } from "#enums/pokeball";
 import { Gender } from "#app/data/gender";
@@ -2091,6 +2091,8 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
       }
       if (!this.hasTrainer()) {
         globalScene.applyModifiers(ShinyRateBoosterModifier, true, shinyThreshold);
+        globalScene.applyModifiers(ShinySandwichItemModifier, true, shinyThreshold, this);
+        console.log("Shiny chance : " + shinyThreshold.value);
       }
     } else {
       shinyThreshold.value = thresholdOverride;
@@ -2126,6 +2128,8 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
       }
       if (!this.hasTrainer()) {
         globalScene.applyModifiers(ShinyRateBoosterModifier, true, shinyThreshold);
+        globalScene.applyModifiers(ShinySandwichItemModifier, true, shinyThreshold, this);
+        console.log("Shiny chance : " + shinyThreshold.value);
       }
     } else {
       shinyThreshold.value = thresholdOverride;
@@ -2855,7 +2859,7 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
     }
 
     const lifeOrbMultiplier = new Utils.NumberHolder(1);
-    globalScene.applyModifiers(HitDamageModifier, source.isPlayer(), source, null, lifeOrbMultiplier, null);
+    globalScene.applyModifiers(HitDamageModifier, source.isPlayer(), source, lifeOrbMultiplier, null);
 
     /** The damage multiplier when the given move critically hits */
     const criticalMultiplier = new Utils.NumberHolder(isCritical ? 1.5 : 1);
@@ -4859,8 +4863,8 @@ export class EnemyPokemon extends Pokemon {
 
     if (!dataSource) {
       this.generateAndPopulateMoveset();
-
-      if (shinyLock || !Overrides.OPP_SHINY_OVERRIDE) {
+      console.log(!Overrides.OPP_SHINY_OVERRIDE);
+      if (shinyLock || (!isNullOrUndefined(Overrides.OPP_SHINY_OVERRIDE) && !Overrides.OPP_SHINY_OVERRIDE)) {
         this.shiny = false;
       } else {
         this.trySetShiny();

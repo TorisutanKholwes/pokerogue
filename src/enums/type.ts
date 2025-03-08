@@ -20,3 +20,7 @@ export enum Type {
   FAIRY,
   STELLAR
 }
+
+export function getTypeKey(type: Type) {
+  return `pokemonInfo:Type.${Type[type]}`;
+}

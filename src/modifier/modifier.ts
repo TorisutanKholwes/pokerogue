@@ -2945,6 +2945,7 @@ export class ShinyRateBoosterModifier extends PersistentModifier {
   override apply(boost: NumberHolder): boolean {
     boost.value *= Math.pow(2, 1 + this.getStackCount());
 
+
     return true;
   }
 
@@ -3715,6 +3716,41 @@ export class HitDamageModifier extends PokemonHeldItemModifier {
   getMaxHeldItemCount(_pokemon?: Pokemon): number {
     return 1;
   }
+}
+
+export class ShinySandwichItemModifier extends LapsingPersistentModifier {
+  private sandwichType: Type;
+  private boost: number;
+
+  constructor(modifierType: ModifierType, sandwichType: Type, maxBattles: number, battleCount?: number, stackCount?: number) {
+    super(modifierType, maxBattles, battleCount, stackCount);
+
+    this.sandwichType = sandwichType;
+    this.boost = 7;
+  }
+
+  match(modifier: Modifier): boolean {
+    if (modifier instanceof ShinySandwichItemModifier) {
+      const modifierInstance = modifier as ShinySandwichItemModifier;
+      return modifierInstance.sandwichType === this.sandwichType;
+    }
+    return false;
+  }
+
+  clone() {
+    return new ShinySandwichItemModifier(this.type, this.sandwichType, this.getMaxBattles(), this.getBattleCount(), this.stackCount);
+  }
+
+  override shouldApply(_booster: NumberHolder, target?: Pokemon | null): boolean {
+    console.log(target?.getTypes().includes(this.sandwichType) ?? false);
+    return target?.getTypes().includes(this.sandwichType) ?? false;
+  }
+
+  override apply(booster: NumberHolder, _target?: Pokemon | null) {
+    booster.value += Math.pow(2, this.boost) * 64;
+    return true;
+  }
+
 }
 
 

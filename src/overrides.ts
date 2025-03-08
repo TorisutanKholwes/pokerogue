@@ -16,6 +16,7 @@ import { StatusEffect } from "#enums/status-effect";
 import { TimeOfDay } from "#enums/time-of-day";
 import { VariantTier } from "#enums/variant-tier";
 import { WeatherType } from "#enums/weather-type";
+import { Type } from "#enums/type";
 
 /**
  * Overrides that are using when testing different in game situations
@@ -35,28 +36,33 @@ import { WeatherType } from "#enums/weather-type";
 const overrides = {
   STARTING_LEVEL_OVERRIDE: 100,
   STARTER_SPECIES_OVERRIDE: Species.ETERNATUS,
-  STARTING_HELD_ITEMS_OVERRIDE: [
+  STARTING_WAVE_OVERRIDE: 11,
+  /*STARTING_HELD_ITEMS_OVERRIDE: [
     { name: "LIFE_ORB" }
-  ],
+  ],*/
   ABILITY_OVERRIDE: Abilities.SHEER_FORCE,
-  SHINY_OVERRIDE: true,
-  VARIANT_OVERRIDE: 2,
+  //SHINY_OVERRIDE: true,
+  //VARIANT_OVERRIDE: 2,
   MOVESET_OVERRIDE: [
     Moves.FAKE_OUT,
     Moves.SWORDS_DANCE,
-    Moves.TACKLE,
+    Moves.FLAMETHROWER,
     Moves.TRIPLE_AXEL
   ],
   //OPP_ABILITY_OVERRIDE: Abilities.STURDY,
-  OPP_IVS_OVERRIDE: [ 31, 31, 31, 31, 31, 31 ],
+  /*OPP_IVS_OVERRIDE: [ 31, 31, 31, 31, 31, 31 ],
   OPP_LEVEL_OVERRIDE: 5,
   OPP_SPECIES_OVERRIDE: Species.BLISSEY,
   OPP_MOVESET_OVERRIDE: [
     Moves.SUBSTITUTE
   ],
   OPP_SHINY_OVERRIDE: true,
-  OPP_VARIANT_OVERRIDE: 2,
-  BATTLE_TYPE_OVERRIDE: "single"
+  OPP_VARIANT_OVERRIDE: 2,*/
+  BATTLE_TYPE_OVERRIDE: "single",
+  ITEM_REWARD_OVERRIDE: [{ "name": "SHINY_SANDWICH", type: Type.NORMAL }],
+
+  MYSTERY_ENCOUNTER_OVERRIDE: MysteryEncounterType.DARK_DEAL,
+  MYSTERY_ENCOUNTER_RATE_OVERRIDE: 256
 } satisfies Partial<InstanceType<typeof DefaultOverrides>>;
 
 /**
