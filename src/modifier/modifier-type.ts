@@ -11,7 +11,7 @@ import { getTypeKey, Type } from "#enums/type";
 import type { EnemyPokemon, PlayerPokemon, PokemonMove } from "#app/field/pokemon";
 import type Pokemon from "#app/field/pokemon";
 import { getPokemonNameWithAffix } from "#app/messages";
-import {
+import BerryIncrementModifier, {
   AddPokeballModifier,
   AddVoucherModifier,
   AttackTypeBoosterModifier,
@@ -1776,7 +1776,8 @@ export const modifierTypes = {
   MYSTERY_ENCOUNTER_GOLDEN_BUG_NET: () => new ModifierType("modifierType:ModifierType.MYSTERY_ENCOUNTER_GOLDEN_BUG_NET", "golden_net", (type, _args) => new BoostBugSpawnModifier(type)),
 
   LIFE_ORB: () => new PokemonHeldItemModifierType("modifierType:ModifierType.LIFE_ORB", "life_orb", (type, args) => new HitDamageModifier(type, (args[0] as Pokemon).id, 0.3)),
-  SHINY_SANDWICH: () => new ShinySandwichItemModifierTypeGenerator()
+  SHINY_SANDWICH: () => new ShinySandwichItemModifierTypeGenerator(),
+  BERRY_POTS: () => new ModifierType("modifierType:ModifierType.BERRY_POTS", "berry_pots", (type, _args) => new BerryIncrementModifier(type))
 };
 
 interface ModifierPool {
@@ -2047,6 +2048,7 @@ const modifierPool: ModifierPool = {
     new WeightedModifierType(modifierTypes.MASTER_BALL, () => (hasMaximumBalls(PokeballType.MASTER_BALL)) ? 0 : 24, 24),
     new WeightedModifierType(modifierTypes.SHINY_CHARM, 14),
     new WeightedModifierType(modifierTypes.HEALING_CHARM, 18),
+    new WeightedModifierType(modifierTypes.BERRY_POTS, 18),
     new WeightedModifierType(modifierTypes.MULTI_LENS, 18),
     new WeightedModifierType(modifierTypes.VOUCHER_PREMIUM, (_party: Pokemon[], rerollCount: number) =>
       !globalScene.gameMode.isDaily && !globalScene.gameMode.isEndless && !globalScene.gameMode.isSplicedOnly ? Math.max(5 - rerollCount * 2, 0) : 0, 5),

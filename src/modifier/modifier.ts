@@ -1812,10 +1812,12 @@ export class BerryModifier extends PokemonHeldItemModifier {
   }
 
   getMaxHeldItemCount(pokemon: Pokemon): number {
+    const maxBerry = new NumberHolder(3);
     if ([ BerryType.LUM, BerryType.LEPPA, BerryType.SITRUS, BerryType.ENIGMA ].includes(this.berryType)) {
-      return 2;
+      maxBerry.value = 2;
     }
-    return 3;
+    globalScene.applyModifier(BerryIncrementModifier, pokemon.isPlayer(), maxBerry);
+    return maxBerry.value;
   }
 }
 
@@ -3753,6 +3755,29 @@ export class ShinySandwichItemModifier extends LapsingPersistentModifier {
 
 }
 
+export default class BerryIncrementModifier extends PersistentModifier {
+
+  constructor(type: ModifierType) {
+    super(type);
+  }
+
+  match(modifier: Modifier): boolean {
+    return modifier instanceof BerryIncrementModifier;
+  }
+
+  clone() {
+    return new BerryIncrementModifier(this.type);
+  }
+
+  getMaxStackCount(_forThreshold?: boolean): number {
+    return 3;
+  }
+
+  apply(maxStackBerry: NumberHolder): boolean {
+    maxStackBerry.value += this.stackCount;
+    return true;
+  }
+}
 
 /**
  * Uses either `MODIFIER_OVERRIDE` in overrides.ts to set {@linkcode PersistentModifier}s for either:

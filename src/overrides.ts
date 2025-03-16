@@ -16,7 +16,7 @@ import { StatusEffect } from "#enums/status-effect";
 import { TimeOfDay } from "#enums/time-of-day";
 import { VariantTier } from "#enums/variant-tier";
 import { WeatherType } from "#enums/weather-type";
-import { Type } from "#enums/type";
+import { BerryType } from "#enums/berry-type";
 
 /**
  * Overrides that are using when testing different in game situations
@@ -59,10 +59,7 @@ const overrides = {
   OPP_SHINY_OVERRIDE: true,
   OPP_VARIANT_OVERRIDE: 2,*/
   BATTLE_TYPE_OVERRIDE: "single",
-  ITEM_REWARD_OVERRIDE: [{ "name": "SHINY_SANDWICH", type: Type.NORMAL }],
-
-  MYSTERY_ENCOUNTER_OVERRIDE: MysteryEncounterType.DARK_DEAL,
-  MYSTERY_ENCOUNTER_RATE_OVERRIDE: 256
+  ITEM_REWARD_OVERRIDE: [{ "name": "BERRY_POTS" }, { "name": "BERRY", "type": BerryType.SITRUS }]
 } satisfies Partial<InstanceType<typeof DefaultOverrides>>;
 
 /**
